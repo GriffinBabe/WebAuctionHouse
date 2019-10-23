@@ -1,0 +1,13 @@
+main: be.griffinbabe.webauctionhouse.Main
+name: WebAuctionHouse
+version: 1.0
+author: GriffinBabe
+description: Minecraft auction house with website support
+commands:
+  helpwah:
+    description: Help pages for WebAuctionHouse plugin
+    usage: /helpwah
+    permission: webauctionhouse.help
+    permission-message: You don't have the webauctionhouse.help permission.
+
+
