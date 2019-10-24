@@ -40,7 +40,7 @@ public class SignEvents implements Listener {
      *
      * @param e, the event.
      */
-    @EventHandler (priority = EventPriority.HIGHEST)
+    @EventHandler (priority = EventPriority.NORMAL)
     public void changeSign(SignChangeEvent e) {
         Logger log = plugin.getLogger();
         String lines[] = e.getLines();
@@ -101,7 +101,7 @@ public class SignEvents implements Listener {
      * @param player, the player that makes the registration.
      */
     public void createSellChess(Block sign, Block chess, Player player) {
-
+        // TODO: Write this function
     }
 
     /**
@@ -114,7 +114,7 @@ public class SignEvents implements Listener {
      * @param player, the player that makes the registration.
      */
     public void createBuyChess(Block sign, Block chess, Player player) {
-
+        // TODO: Write this function
     }
 
 
