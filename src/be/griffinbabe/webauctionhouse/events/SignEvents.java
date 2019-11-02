@@ -1,6 +1,7 @@
 package be.griffinbabe.webauctionhouse.events;
 
 import be.griffinbabe.webauctionhouse.Main;
+import be.griffinbabe.webauctionhouse.database.DBConnection;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.block.Sign;
@@ -102,6 +103,8 @@ public class SignEvents implements Listener {
      */
     public void createSellChess(Block sign, Block chess, Player player) {
         // TODO: Write this function
+        DBConnection instance = DBConnection.getInstance();
+
     }
 
     /**
@@ -114,7 +117,14 @@ public class SignEvents implements Listener {
      * @param player, the player that makes the registration.
      */
     public void createBuyChess(Block sign, Block chess, Player player) {
-        // TODO: Write this function
+        String uuid = player.getUniqueId().toString();
+        DBConnection instance = DBConnection.getInstance();
+        if (instance.checkBuySignForUsername(uuid)) {
+            // in this case a buy sign for this player has already been created
+            sign.breakNaturally();
+            return;
+        }
+
     }
 
 
