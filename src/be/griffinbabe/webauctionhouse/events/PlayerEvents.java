@@ -25,10 +25,26 @@ public class PlayerEvents implements Listener {
     public void playerLogin(PlayerLoginEvent e) {
         UUID uuid = e.getPlayer().getUniqueId();
         String id = uuid.toString();
+        String username = e.getPlayer().getDisplayName();
         DBConnection instance = DBConnection.getInstance();
         if (!instance.isPlayerRegistered(id)) {
-            instance.insertPlayer(id);
+            instance.insertPlayer(id, username);
+        } else if (instance.havePlayerNameChanged(id, username)) {
+            // if the player has changed it's username, will change the username in the database
+            // and also change the username in all it's signs
+            instance.changePlayerUsername(id, username);
+            updateSignsNames(id, username);
         }
+    }
+
+    /**
+     * Updates all the signs on the map with the new player's username
+     *
+     * @param id
+     * @param newName
+     */
+    public void updateSignsNames(String id, String newName) {
+        // TODO: Write this function
     }
 
 }
