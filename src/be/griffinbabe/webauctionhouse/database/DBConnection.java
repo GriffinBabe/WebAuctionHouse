@@ -70,6 +70,8 @@ public class DBConnection {
     private static String INSERT_SIGN = "insert into "+SIGN_TABLE+"("+SIGN_OWNER+","+SIGN_CHESS_ID+","+SIGN_X+","+
             SIGN_Y+","+SIGN_Z+","+SIGN_MODE+") VALUES (?,?,?,?,?,?);";
 
+    private static String DROP_TABLE = "drop table if exists ?";
+
     private static DBConnection DBConnection = null;
 
     /**
@@ -261,5 +263,25 @@ public class DBConnection {
         stmt.setInt(4, y);
         stmt.setInt(5, z);
         stmt.setString(6, signMode);
+    }
+
+    /**
+     * Resets the database tables, dropping them and then
+     * calling the {@link #initTables()} function.
+     *
+     * @throws SQLException if there is a problem with the database communication
+     */
+    public void resetDB() throws SQLException {
+        Connection conn = DriverManager.getConnection(DATABASE_PATH);
+        PreparedStatement stmtPlayers = conn.prepareStatement(DROP_TABLE);
+        PreparedStatement stmtSigns = conn.prepareStatement(DROP_TABLE);
+        PreparedStatement stmtChess = conn.prepareStatement(DROP_TABLE);
+        stmtPlayers.setString(1, PLAYER_TABLE);
+        stmtSigns.setString(1, SIGN_TABLE);
+        stmtChess.setString(1, CHESS_TABLE);
+        stmtPlayers.execute();
+        stmtSigns.execute();
+        stmtChess.execute();
+        initTables();
     }
 }
