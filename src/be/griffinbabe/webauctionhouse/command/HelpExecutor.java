@@ -16,7 +16,7 @@ public class HelpExecutor implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
-        commandSender.sendMessage("You fired the helpwah command!");
+        commandSender.sendMessage("You fired the help command!");
         return true;
     }
 }
