@@ -21,9 +21,6 @@ public class DBConnection {
     private static String SIGN_Z = "z";
     private static String SIGN_MODE = "mode";
 
-    private static String SIGN_SELL = "sell";
-    private static String SIGN_BUY = "buy";
-
     private static String CHESS_ID = "id";
     private static String CHESS_OWNER = "player_uuid";
     private static String CHESS_X = "x";
@@ -64,6 +61,9 @@ public class DBConnection {
 
     private static String SEARCH_SIGN_BY_PLAYER_UUID = "select "+SIGN_ID+" from "+SIGN_TABLE+" where "+SIGN_OWNER+" == ?"+
             " and "+SIGN_MODE+" == ?;";
+
+    private static String SEARCH_CHESS_BY_POSITION = "select "+CHESS_ID+" from "+CHESS_TABLE+" where "+CHESS_X+" == ? and "+
+            CHESS_Y+" == ? and "+CHESS_Z+" == ?;";
 
     private static DBConnection DBConnection = null;
 
@@ -139,7 +139,7 @@ public class DBConnection {
             PreparedStatement stmt = conn.prepareStatement(SEARCH_PLAYER_BY_UUID)){
             stmt.setString(1, uuid);
             ResultSet set = stmt.executeQuery();
-            return isQueryEmpty(stmt);
+            return !isQueryEmpty(stmt);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -182,11 +182,11 @@ public class DBConnection {
      * Checks if a player already have a buy sign attached or not.
      * @param id, the player unique id
      */
-    public boolean checkBuySignForUsername(String id) {
+    public boolean checkSignForUsername(String id, String signType) {
         try (Connection conn = DriverManager.getConnection(DATABASE_PATH);
             PreparedStatement stmt = conn.prepareStatement(SEARCH_SIGN_BY_PLAYER_UUID)) {
             stmt.setString(1, id);
-            stmt.setString(2, SIGN_BUY);
+            stmt.setString(2, signType);
             return isQueryEmpty(stmt);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -208,5 +208,18 @@ public class DBConnection {
             return false;
         }
         return true;
+    }
+
+    public boolean isChessRegistered(int x, int y, int z) {
+        try (Connection conn = DriverManager.getConnection(DATABASE_PATH);
+            PreparedStatement stmt = conn.prepareStatement(SEARCH_CHESS_BY_POSITION)) {
+            stmt.setInt(1, x);
+            stmt.setInt(2, y);
+            stmt.setInt(3, z);
+            return !isQueryEmpty(stmt);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 }

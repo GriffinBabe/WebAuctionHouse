@@ -29,6 +29,7 @@ public class PlayerEvents implements Listener {
         DBConnection instance = DBConnection.getInstance();
         if (!instance.isPlayerRegistered(id)) {
             instance.insertPlayer(id, username);
+            System.out.println("New player added to database with username: "+username);
         } else if (instance.havePlayerNameChanged(id, username)) {
             // if the player has changed it's username, will change the username in the database
             // and also change the username in all it's signs
