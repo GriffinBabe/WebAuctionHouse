@@ -27,6 +27,12 @@ public class SignEvents implements Listener {
     private static String WAH_SELL = "[SELL]";
     private static String WAH_BUY = "[BUY]";
 
+    private static String SIGN_BUY = "buy";
+    private static String SIGN_SELL = "sell";
+
+    private static String ALREADY_BUY_SIGN = "You already have a buy chess.";
+    private static String ALREADY_USED_CHESS = "This chess is already in use";
+
     private static int SIGN_LINES = 4;
 
     public SignEvents(Main plugin) {
@@ -119,11 +125,21 @@ public class SignEvents implements Listener {
     public void createBuyChess(Block sign, Block chess, Player player) {
         String uuid = player.getUniqueId().toString();
         DBConnection instance = DBConnection.getInstance();
-        if (instance.checkBuySignForUsername(uuid)) {
+        if (instance.checkSignForUsername(uuid, SIGN_BUY)) {
             // in this case a buy sign for this player has already been created
+            player.sendMessage(ALREADY_BUY_SIGN);
             sign.breakNaturally();
             return;
         }
+        // check if the chess behind is already taken
+        if (instance.isChessRegistered(chess.getX(), chess.getY(), chess.getZ())) {
+            player.sendMessage(ALREADY_USED_CHESS);
+            sign.breakNaturally();
+            return;
+        }
+        int chessId = instance.insertChess(chess.getX(), chess.getY(), chess.getZ(), uuid);
+        instance.insertSign(uuid, chessId, sign.getY(), sign.getY(), sign.getZ(), SIGN_BUY);
+
 
     }
 
