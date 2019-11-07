@@ -2,6 +2,7 @@ package be.griffinbabe.webauctionhouse;
 
 import be.griffinbabe.webauctionhouse.command.AvailableCommands;
 import be.griffinbabe.webauctionhouse.command.HelpExecutor;
+import be.griffinbabe.webauctionhouse.command.ResetDBExecutor;
 import be.griffinbabe.webauctionhouse.database.DBConnection;
 import be.griffinbabe.webauctionhouse.events.PlayerEvents;
 import be.griffinbabe.webauctionhouse.events.SignEvents;
@@ -10,6 +11,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.sql.SQLException;
 import java.util.logging.Logger;
 
 public class Main extends JavaPlugin {
@@ -29,6 +31,8 @@ public class Main extends JavaPlugin {
         try {
             this.getCommand(AvailableCommands.HELP.name)
                     .setExecutor(new HelpExecutor(this));
+            this.getCommand(AvailableCommands.RESETDB.name)
+                    .setExecutor(new ResetDBExecutor(this));
         } catch (NullPointerException e) {
             l.info("Can't load command executor for a command. "+
                     "Please check if the command is properly defined in the plugin.yml file." );
@@ -46,7 +50,11 @@ public class Main extends JavaPlugin {
         this.saveConfig();
         this.saveDefaultConfig();
         // Getting the instance will check if the database has already been initialized
-        DBConnection.getInstance();
+        try {
+            DBConnection.getInstance();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

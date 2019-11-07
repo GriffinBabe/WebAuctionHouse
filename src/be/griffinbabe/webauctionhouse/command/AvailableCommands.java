@@ -2,7 +2,9 @@ package be.griffinbabe.webauctionhouse.command;
 
 public enum AvailableCommands {
 
-    HELP("helpwah");
+    HELP("wah help"),
+    RESETDB("wah reset-db");
+
 
     public String name;
 

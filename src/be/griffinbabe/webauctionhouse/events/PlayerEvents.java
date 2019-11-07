@@ -7,6 +7,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerLoginEvent;
 
+import java.sql.SQLException;
 import java.util.UUID;
 
 /**
@@ -22,19 +23,23 @@ public class PlayerEvents implements Listener {
     }
 
     @EventHandler (priority = EventPriority.NORMAL)
-    public void playerLogin(PlayerLoginEvent e) {
-        UUID uuid = e.getPlayer().getUniqueId();
+    public void playerLogin(PlayerLoginEvent event) {
+        UUID uuid = event.getPlayer().getUniqueId();
         String id = uuid.toString();
-        String username = e.getPlayer().getDisplayName();
-        DBConnection instance = DBConnection.getInstance();
-        if (!instance.isPlayerRegistered(id)) {
-            instance.insertPlayer(id, username);
-            System.out.println("New player added to database with username: "+username);
-        } else if (instance.havePlayerNameChanged(id, username)) {
-            // if the player has changed it's username, will change the username in the database
-            // and also change the username in all it's signs
-            instance.changePlayerUsername(id, username);
-            updateSignsNames(id, username);
+        String username = event.getPlayer().getDisplayName();
+        try {
+            DBConnection instance = DBConnection.getInstance();
+            if (!instance.isPlayerRegistered(id)) {
+                instance.insertPlayer(id, username);
+                System.out.println("New player added to database with username: "+username);
+            } else if (instance.havePlayerNameChanged(id, username)) {
+                // if the player has changed it's username, will change the username in the database
+                // and also change the username in all it's signs
+                instance.changePlayerUsername(id, username);
+                updateSignsNames(id, username);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 

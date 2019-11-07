@@ -13,6 +13,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.SignChangeEvent;
 
+import java.sql.SQLException;
 import java.util.logging.Logger;
 
 /**
@@ -32,6 +33,10 @@ public class SignEvents implements Listener {
 
     private static String ALREADY_BUY_SIGN = "You already have a buy chess.";
     private static String ALREADY_USED_CHESS = "This chess is already in use";
+    private static String INTERNAL_ERROR_CREATE = "Internal error, couldn't create chess and/or sign. Please contact an " +
+            "administrator";
+    private static String BUY_SIGN_CREATED = "Buy sign created";
+    private static String SELL_SIGN_CREATED = "Sell sign created";
 
     private static int SIGN_LINES = 4;
 
@@ -43,7 +48,7 @@ public class SignEvents implements Listener {
      * Handles the {@link SignChangeEvent} by checking
      * if the sign is correctly formatted and behind
      * a chess. It will then proceed by calling
-     * {@link #createSellChess} and {@link #createBuyChess}.
+     * {@link #createSignAndChess(Block, Block, Player, String)}.
      *
      * @param e, the event.
      */
@@ -65,10 +70,10 @@ public class SignEvents implements Listener {
                 return;
             }
             if (lines[1].equalsIgnoreCase(WAH_SELL)) {
-                createSellChess(sign, chess, e.getPlayer());
+                createSignAndChess(sign, chess, e.getPlayer(), SIGN_SELL);
             }
             else if (lines[1].equalsIgnoreCase(WAH_BUY)) {
-                createBuyChess(sign, chess, e.getPlayer());
+                createSignAndChess(sign, chess, e.getPlayer(), SIGN_BUY);
             }
             else {
                 e.getPlayer().sendMessage(Main.CHAT_TAG+"2nd line must be either [SELL] or [BUY].");
@@ -99,47 +104,49 @@ public class SignEvents implements Listener {
         return null;
     }
 
-
     /**
-     * Creates a sell chess, storing the chess data in our database.
+     * Creates a buy/sell chess and sign. It will perform checks as
+     * if the chess isn't already registered for another sign, or if
+     * the players hasn't already a buy chess if it is a buy chess.
      *
      * @param sign, the sign on the block
      * @param chess, the registered chess
      * @param player, the player that makes the registration.
      */
-    public void createSellChess(Block sign, Block chess, Player player) {
-        // TODO: Write this function
-        DBConnection instance = DBConnection.getInstance();
-
-    }
-
-    /**
-     * Checks first if there in no buy chess already assigned for this player.
-     * If there is already one, it will destroy the sign and tell where is existing chess.
-     * If there is no chess, it will add it to.
-     *
-     * @param sign, the sign on the block
-     * @param chess, the registered chess
-     * @param player, the player that makes the registration.
-     */
-    public void createBuyChess(Block sign, Block chess, Player player) {
-        String uuid = player.getUniqueId().toString();
-        DBConnection instance = DBConnection.getInstance();
-        if (instance.checkSignForUsername(uuid, SIGN_BUY)) {
-            // in this case a buy sign for this player has already been created
-            player.sendMessage(ALREADY_BUY_SIGN);
-            sign.breakNaturally();
-            return;
+    public void createSignAndChess(Block sign, Block chess, Player player, String chessType) {
+        try {
+            String uuid = player.getUniqueId().toString();
+            DBConnection instance = DBConnection.getInstance();
+            if (chessType.equalsIgnoreCase(SIGN_BUY)) {
+                if (instance.checkSignForUsername(uuid, SIGN_BUY)) {
+                    // in this case a buy sign for this player has already been created
+                    player.sendMessage(ALREADY_BUY_SIGN);
+                    sign.breakNaturally();
+                    return;
+                }
+            }
+            // check if the chess behind is already taken
+            if (instance.isChessRegistered(chess.getX(), chess.getY(), chess.getZ())) {
+                player.sendMessage(ALREADY_USED_CHESS);
+                sign.breakNaturally();
+                return;
+            }
+            Long chessId = instance.insertChess(chess.getX(), chess.getY(), chess.getZ(), uuid);
+            if (chessId != null) {
+                instance.insertSign(uuid, chessId, sign.getX(), sign.getY(), sign.getZ(), chessType);
+                if (chessType.equalsIgnoreCase(SIGN_BUY)) {
+                    player.sendMessage(BUY_SIGN_CREATED);
+                } else if (chessType.equalsIgnoreCase(SIGN_SELL)) {
+                    player.sendMessage(SELL_SIGN_CREATED);
+                }
+            } else {
+                System.out.println(INTERNAL_ERROR_CREATE);
+                sign.breakNaturally();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            player.sendMessage(INTERNAL_ERROR_CREATE);
         }
-        // check if the chess behind is already taken
-        if (instance.isChessRegistered(chess.getX(), chess.getY(), chess.getZ())) {
-            player.sendMessage(ALREADY_USED_CHESS);
-            sign.breakNaturally();
-            return;
-        }
-        int chessId = instance.insertChess(chess.getX(), chess.getY(), chess.getZ(), uuid);
-        instance.insertSign(uuid, chessId, sign.getY(), sign.getY(), sign.getZ(), SIGN_BUY);
-
 
     }
 
