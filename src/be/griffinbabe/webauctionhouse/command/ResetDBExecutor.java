@@ -1,13 +1,18 @@
 package be.griffinbabe.webauctionhouse.command;
 
 import be.griffinbabe.webauctionhouse.Main;
+import be.griffinbabe.webauctionhouse.database.DBConnection;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
+import java.sql.SQLException;
+
 public class ResetDBExecutor implements CommandExecutor {
 
     private Main plugin;
+
+    private static String INTERNAL_ERROR = "Internal SQLException, can't reset database";
 
     public ResetDBExecutor(Main plugin) {
         this.plugin = plugin;
@@ -15,6 +20,14 @@ public class ResetDBExecutor implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
+        try {
+            DBConnection instance = DBConnection.getInstance();
+            instance.resetDatabase();
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            commandSender.sendMessage(INTERNAL_ERROR);
+        }
         return false;
     }
 }
