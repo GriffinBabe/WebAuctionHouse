@@ -20,10 +20,6 @@ public class Main extends JavaPlugin {
 
     public static String PLUGIN_FOLDER = "WebAuctionHouse/";
 
-    public static void main(String[] args) {
-
-    }
-
     @Override
     public void onEnable() {
         Logger l = getLogger();
