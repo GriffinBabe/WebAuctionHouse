@@ -8,3 +8,4 @@ lib/
 .idea/tasks.xml
 .idea/*.iws
 .idea/dataSources.xml
+.idea/misc.xml
