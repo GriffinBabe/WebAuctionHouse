@@ -11,7 +11,6 @@ import java.sql.SQLException;
 public class ResetDBExecutor implements CommandExecutor {
 
     private static String SUCCESS_MESSAGE = "Database reseted, please log again";
-    private static String INTERNAL_ERROR_MESSAGE = "Internal SQLException, can't reset database";
 
     private Main plugin;
 
@@ -27,7 +26,7 @@ public class ResetDBExecutor implements CommandExecutor {
             commandSender.sendMessage(SUCCESS_MESSAGE);
         } catch (SQLException e) {
             e.printStackTrace();
-            commandSender.sendMessage(INTERNAL_ERROR_MESSAGE);
+            commandSender.sendMessage(Main.INTERNAL_ERROR_MESSAGE);
         }
         return false;
     }
