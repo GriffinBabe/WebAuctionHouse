@@ -127,6 +127,7 @@ public class DBConnection {
         stmt.execute(CREATE_PLAYER_TABLE);
         stmt.execute(CREATE_CHESS_TABLE);
         stmt.execute(CREATE_SIGN_TABLE);
+        stmt.close();
     }
 
     /**
@@ -141,6 +142,7 @@ public class DBConnection {
         stmt.setString(2, username);
         stmt.execute();
         System.out.println("Player with UUID: "+uuid+" inserted to database.");
+        stmt.close();
     }
 
     /**
@@ -155,7 +157,9 @@ public class DBConnection {
         PreparedStatement stmt = conn.prepareStatement(SEARCH_PLAYER_BY_UUID);
         stmt.setString(1, uuid);
         ResultSet set = stmt.executeQuery();
-        return !isQueryEmpty(stmt);
+        boolean val = !isQueryEmpty(stmt);
+        stmt.close();
+        return val;
     }
 
     /**
@@ -173,7 +177,9 @@ public class DBConnection {
         PreparedStatement stmt = conn.prepareStatement(SEARCH_PLAYER_BY_UUID_AND_USERNAME);
         stmt.setString(1, uuid);
         stmt.setString(2, username);
-        return isQueryEmpty(stmt);
+        boolean val = isQueryEmpty(stmt);
+        stmt.close();
+        return val;
     }
 
     /**
@@ -190,6 +196,7 @@ public class DBConnection {
         stmt.setString(2, uuid);
         stmt.execute();
         System.out.println("Player with UUID: "+uuid+" changed it's username with: "+newName);
+        stmt.close();
     }
 
     /**
@@ -204,7 +211,9 @@ public class DBConnection {
         PreparedStatement stmt = conn.prepareStatement(SEARCH_SIGN_BY_PLAYER_UUID);
         stmt.setString(1, id);
         stmt.setString(2, signMode);
-        return !isQueryEmpty(stmt);
+        boolean val = !isQueryEmpty(stmt);
+        stmt.close();
+        return val;
     }
 
     /**
@@ -238,10 +247,12 @@ public class DBConnection {
         stmt.setInt(3, z);
         ResultSet set = stmt.executeQuery();
         if (!set.next()) {
+            stmt.close();
             return null;
         }
         else {
             Long result = set.getLong(1);
+            stmt.close();
             return result;
         }
     }
@@ -265,6 +276,7 @@ public class DBConnection {
         stmt.setString(4, uuid);
         stmt.executeUpdate();
         ResultSet generatedKeys = stmt.getGeneratedKeys();
+        stmt.close();
         generatedKeys.next();
         return generatedKeys.getLong(1);
     }
@@ -290,6 +302,7 @@ public class DBConnection {
         stmt.setInt(5, z);
         stmt.setString(6, signMode);
         stmt.execute();
+        stmt.close();
     }
 
 
@@ -305,8 +318,11 @@ public class DBConnection {
         Statement stmtSigns = conn.createStatement();
         Statement stmtChess = conn.createStatement();
         stmtPlayers.execute(DROP_TABLE_PLAYER);
+        stmtPlayers.close();
         stmtSigns.execute(DROP_TABLE_SIGN);
+        stmtSigns.close();
         stmtChess.execute(DROP_TABLE_CHESS);
+        stmtChess.close();
         initTables();
     }
 
@@ -323,11 +339,13 @@ public class DBConnection {
         stmt.setInt(1, chessId.intValue());
         ResultSet set = stmt.executeQuery();
         if (!set.next()) {
+            stmt.close();
             return null;
         } else {
             int x = set.getInt(1);
             int y = set.getInt(2);
             int z = set.getInt(3);
+            stmt.close();
             return new Vector(x,y,z);
         }
     }
@@ -339,12 +357,16 @@ public class DBConnection {
      */
     public void deleteChestAndSign(Long chestId) throws SQLException {
         Connection conn = DriverManager.getConnection(DATABASE_PATH);
+
         PreparedStatement stmtSign = conn.prepareStatement(DELETE_SIGN_BY_CHEST_ID);
         stmtSign.setInt(1, chestId.intValue());
         stmtSign.execute();
+        stmtSign.close();
+
         PreparedStatement stmtChest = conn.prepareStatement(DELETE_CHEST_BY_ID);
         stmtChest.setInt(1, chestId.intValue());
         stmtChest.execute();
+        stmtChest.close();
     }
 
     /**
@@ -355,6 +377,7 @@ public class DBConnection {
         // TODO Write this function
     }
 
+    @SuppressWarnings("Duplicates")
     public Pair<Long,Long> getSignIdByPosition(int x, int y, int z) throws SQLException {
         Connection conn = DriverManager.getConnection(DATABASE_PATH);
         PreparedStatement stmt = conn.prepareStatement(SEARCH_SIGN_BY_POSITION);
@@ -363,10 +386,12 @@ public class DBConnection {
         stmt.setInt(3, z);
         ResultSet set = stmt.executeQuery();
         if (!set.next()) {
+            stmt.close();
             return null;
         }
         Long signId = set.getLong(1);
         Long chestId = set.getLong(2);
+        stmt.close();
         return new Pair<Long, Long>(signId, chestId);
     }
 }

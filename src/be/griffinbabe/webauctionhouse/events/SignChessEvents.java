@@ -3,6 +3,7 @@ package be.griffinbabe.webauctionhouse.events;
 import be.griffinbabe.webauctionhouse.Main;
 import be.griffinbabe.webauctionhouse.database.DBConnection;
 import be.griffinbabe.webauctionhouse.util.Pair;
+import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
@@ -14,7 +15,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.SignChangeEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 
 import java.sql.SQLException;
 import java.util.logging.Logger;
@@ -88,6 +91,25 @@ public class SignChessEvents implements Listener {
     }
 
     /**
+     * Handles the {@link EntityExplodeEvent} by checking
+     * if the block is a {@link Sign} or a {@link Chest}
+     * and then calling the adequate function.
+     * @param e, the event
+     */
+    @EventHandler (priority = EventPriority.NORMAL)
+    public void explodedSignOrChess(EntityExplodeEvent e) {
+        for (Block block : e.blockList()) {
+            BlockState state = block.getState();
+            if (state instanceof Chest) {
+                chestDestroyed((Chest)state, null);
+            }
+            else if (state instanceof Sign) {
+                signDestroyed((Sign)state, null);
+            }
+        }
+    }
+
+    /**
      * Handles the {@link BlockBreakEvent} by checking
      * if the block is a {@link Sign} or a {@link Chest}
      * and then calling the adequate function.
@@ -120,10 +142,14 @@ public class SignChessEvents implements Listener {
             if (chessId != null) {
                 instance.deleteChestAndSign(chessId);
                 instance.deleteRelatedChestItems(chessId);
-                player.sendMessage(SIGN_CHEST_DELETED);
+                if (player != null) {
+                    player.sendMessage(SIGN_CHEST_DELETED);
+                }
             }
         } catch (SQLException e){
-            player.sendMessage(Main.INTERNAL_ERROR_MESSAGE);
+            if (player != null) {
+                player.sendMessage(Main.INTERNAL_ERROR_MESSAGE);
+            }
             e.printStackTrace();
         }
 
@@ -143,10 +169,14 @@ public class SignChessEvents implements Listener {
             if (signAndChestIDs != null) {
                 instance.deleteChestAndSign(signAndChestIDs.second);
                 instance.deleteRelatedChestItems(signAndChestIDs.second);
-                player.sendMessage(SIGN_CHEST_DELETED);
+                if (player != null) {
+                    player.sendMessage(SIGN_CHEST_DELETED);
+                }
             }
         } catch (SQLException e) {
-            player.sendMessage(Main.INTERNAL_ERROR_MESSAGE);
+            if (player != null) {
+                player.sendMessage(Main.INTERNAL_ERROR_MESSAGE);
+            }
             e.printStackTrace();
         }
     }
