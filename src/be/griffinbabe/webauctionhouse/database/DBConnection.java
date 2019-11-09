@@ -70,7 +70,7 @@ public class DBConnection {
     private static String INSERT_SIGN = "insert into "+SIGN_TABLE+"("+SIGN_OWNER+","+SIGN_CHESS_ID+","+SIGN_X+","+
             SIGN_Y+","+SIGN_Z+","+SIGN_MODE+") VALUES (?,?,?,?,?,?);";
 
-    private static String DROP_TABLE = "drop table if exists database.;";
+    private static String DROP_TABLE = "drop table if exists database.?;";
 
     private static DBConnection DBConnection = null;
 
@@ -265,19 +265,24 @@ public class DBConnection {
         stmt.setString(6, signMode);
     }
 
-    public void resetDatabase() throws SQLException {
+
+    /**
+     * Resets the database tables, dropping them and then
+     * calling the {@link #initTables()} function.
+     *
+     * @throws SQLException if there is a problem with the database communication
+     */
+    public void resetDB() throws SQLException {
         Connection conn = DriverManager.getConnection(DATABASE_PATH);
-        PreparedStatement stmtSign = conn.prepareStatement(DROP_TABLE);
-        stmtSign.setString(1, SIGN_TABLE);
+        PreparedStatement stmtPlayers = conn.prepareStatement(DROP_TABLE);
+        PreparedStatement stmtSigns = conn.prepareStatement(DROP_TABLE);
         PreparedStatement stmtChess = conn.prepareStatement(DROP_TABLE);
+        stmtPlayers.setString(1, PLAYER_TABLE);
+        stmtSigns.setString(1, SIGN_TABLE);
         stmtChess.setString(1, CHESS_TABLE);
-        PreparedStatement stmtPlayer = conn.prepareStatement(DROP_TABLE);
-        stmtPlayer.setString(1, PLAYER_TABLE);
-
-        stmtSign.execute();
+        stmtPlayers.execute();
+        stmtSigns.execute();
         stmtChess.execute();
-        stmtPlayer.execute();
-
         initTables();
     }
 }

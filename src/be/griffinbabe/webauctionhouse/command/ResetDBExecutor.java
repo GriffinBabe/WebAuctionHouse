@@ -10,6 +10,9 @@ import java.sql.SQLException;
 
 public class ResetDBExecutor implements CommandExecutor {
 
+    private static String SUCCESS = "Database reseted, please log again";
+    private static String INTERNAL_ERROR = "Internal error, couldn't reset database";
+
     private Main plugin;
 
     private static String INTERNAL_ERROR = "Internal SQLException, can't reset database";
@@ -21,9 +24,9 @@ public class ResetDBExecutor implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
         try {
-            DBConnection instance = DBConnection.getInstance();
-            instance.resetDatabase();
-            return true;
+            DBConnection connection = DBConnection.getInstance();
+            connection.resetDB();
+            commandSender.sendMessage(SUCCESS);
         } catch (SQLException e) {
             e.printStackTrace();
             commandSender.sendMessage(INTERNAL_ERROR);
