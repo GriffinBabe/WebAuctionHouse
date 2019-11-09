@@ -1,5 +1,8 @@
 package be.griffinbabe.webauctionhouse.database;
 
+import org.bukkit.util.Vector;
+
+import javax.xml.transform.Result;
 import java.sql.*;
 
 /**
@@ -60,6 +63,9 @@ public class DBConnection {
 
     private static String SEARCH_SIGN_BY_PLAYER_UUID = "select "+SIGN_ID+" from "+SIGN_TABLE+" where "+SIGN_OWNER+" == ?"+
             " and "+SIGN_MODE+" == ?;";
+
+    private static String GET_SIGN_POS_BY_CHESS_ID = "select "+SIGN_X+", "+SIGN_Y+", "+SIGN_Z+" from "+SIGN_TABLE+
+            " where "+SIGN_CHESS_ID+" == ?;";
 
     private static String SEARCH_CHESS_BY_POSITION = "select "+CHESS_ID+" from "+CHESS_TABLE+" where "+CHESS_X+" == ? and "+
             CHESS_Y+" == ? and "+CHESS_Z+" == ?;";
@@ -197,10 +203,7 @@ public class DBConnection {
      */
     private boolean isQueryEmpty(PreparedStatement stmt) throws SQLException{
         ResultSet set = stmt.executeQuery();
-        while (set.next()) {
-            return false;
-        }
-        return true;
+        return set.next();
     }
 
     /**
@@ -213,13 +216,20 @@ public class DBConnection {
      * @return true if the player is already registered, false otherwise
      * @throws SQLException if there is a problem with the database communication
      */
-    public boolean isChessRegistered(int x, int y, int z) throws SQLException {
+    public Long getChestIdByPosition(int x, int y, int z) throws SQLException {
         Connection conn = DriverManager.getConnection(DATABASE_PATH);
         PreparedStatement stmt = conn.prepareStatement(SEARCH_CHESS_BY_POSITION);
         stmt.setInt(1, x);
         stmt.setInt(2, y);
         stmt.setInt(3, z);
-        return !isQueryEmpty(stmt);
+        ResultSet set = stmt.executeQuery();
+        if (!set.next()) {
+            return null;
+        }
+        else {
+            Long result = set.getLong(0);
+            return result;
+        }
     }
 
     /**
@@ -283,5 +293,27 @@ public class DBConnection {
         stmtSigns.execute(DROP_TABLE_SIGN);
         stmtChess.execute(DROP_TABLE_CHESS);
         initTables();
+    }
+
+    /**
+     * Returns the position of a sign from the attached chest id.
+     *
+     * @param chessId, the attached chest id
+     * @return the position, in the {@link Vector} data type.
+     * @throws SQLException if there is a problem with the database communication.
+     */
+    public Vector getSignPositionByChessId(Long chessId) throws SQLException {
+        Connection conn = DriverManager.getConnection(DATABASE_PATH);
+        PreparedStatement stmt = conn.prepareStatement(GET_SIGN_POS_BY_CHESS_ID);
+        stmt.setInt(1, chessId.intValue());
+        ResultSet set = stmt.executeQuery();
+        if (!set.next()) {
+            return null;
+        } else {
+            int x = set.getInt(0);
+            int y = set.getInt(1);
+            int z = set.getInt(2);
+            return new Vector(x,y,z);
+        }
     }
 }

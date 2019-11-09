@@ -5,7 +5,7 @@ import be.griffinbabe.webauctionhouse.command.HelpExecutor;
 import be.griffinbabe.webauctionhouse.command.ResetDBExecutor;
 import be.griffinbabe.webauctionhouse.database.DBConnection;
 import be.griffinbabe.webauctionhouse.events.PlayerEvents;
-import be.griffinbabe.webauctionhouse.events.SignEvents;
+import be.griffinbabe.webauctionhouse.events.SignChessEvents;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -20,6 +20,8 @@ public class Main extends JavaPlugin {
 
     public static String PLUGIN_FOLDER = "WebAuctionHouse/";
 
+    public static String INTERNAL_ERROR_MESSAGE = CHAT_TAG+"Internal SQLException, can't reset database";
+
     @Override
     public void onEnable() {
         Logger l = getLogger();
@@ -33,7 +35,7 @@ public class Main extends JavaPlugin {
             l.info("Can't load command executor for a command. "+
                     "Please check if the command is properly defined in the plugin.yml file." );
         }
-        getServer().getPluginManager().registerEvents(new SignEvents(this), this);
+        getServer().getPluginManager().registerEvents(new SignChessEvents(this), this);
         getServer().getPluginManager().registerEvents(new PlayerEvents(this), this);
         checkDataFiles();
         super.onEnable();
