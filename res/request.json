@@ -1,0 +1,10 @@
+{
+    "agent": {
+        "name": "Minecraft",
+        "version": 1
+    },
+    "username": "darius.couchard@hotmail.com",
+    "password": "doudou97",
+    "clientToken": "client identifier",
+    "requestUser": true
+}

@@ -9,4 +9,3 @@ lib/
 .idea/*.iws
 .idea/dataSources.xml
 .idea/misc.xml
-res/request.json
