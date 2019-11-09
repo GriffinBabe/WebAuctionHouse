@@ -14,6 +14,8 @@ public class DBConnection {
 
     private static String SIGN_TABLE = "signs";
     private static String CHESS_TABLE = "chess";
+    private static String PLAYER_TABLE = "players";
+    private static String ITEM_TABLE = "items";
 
     private static String SIGN_ID = "id";
     private static String SIGN_OWNER = "player_uuid";
@@ -29,9 +31,12 @@ public class DBConnection {
     private static String CHESS_Y = "y";
     private static String CHESS_Z = "z";
 
-    private static String PLAYER_TABLE = "players";
     private static String PLAYER_UUID = "uuid";
     private static String PLAYER_USERNAME = "username";
+
+    private static String ITEM_ID = "id";
+    private static String ITEM_CHESS_ID = "chess_id";
+    private static String
 
     private static String CREATE_SIGN_TABLE = "CREATE TABLE IF NOT EXISTS "+SIGN_TABLE+
             "(" + SIGN_ID + " integer PRIMARY KEY, \n" +

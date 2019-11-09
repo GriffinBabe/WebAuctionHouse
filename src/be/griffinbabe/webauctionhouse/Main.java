@@ -4,6 +4,7 @@ import be.griffinbabe.webauctionhouse.command.AvailableCommands;
 import be.griffinbabe.webauctionhouse.command.HelpExecutor;
 import be.griffinbabe.webauctionhouse.command.ResetDBExecutor;
 import be.griffinbabe.webauctionhouse.database.DBConnection;
+import be.griffinbabe.webauctionhouse.events.ItemEvents;
 import be.griffinbabe.webauctionhouse.events.PlayerEvents;
 import be.griffinbabe.webauctionhouse.events.SignChessEvents;
 import org.bukkit.ChatColor;
@@ -37,6 +38,7 @@ public class Main extends JavaPlugin {
         }
         getServer().getPluginManager().registerEvents(new SignChessEvents(this), this);
         getServer().getPluginManager().registerEvents(new PlayerEvents(this), this);
+        getServer().getPluginManager().registerEvents(new ItemEvents(this), this);
         checkDataFiles();
         super.onEnable();
     }
