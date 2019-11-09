@@ -2,7 +2,9 @@ package be.griffinbabe.webauctionhouse.events;
 
 import be.griffinbabe.webauctionhouse.Main;
 import be.griffinbabe.webauctionhouse.database.DBConnection;
+import be.griffinbabe.webauctionhouse.util.Pair;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
 import org.bukkit.block.Sign;
 import org.bukkit.block.data.BlockData;
@@ -38,6 +40,8 @@ public class SignChessEvents implements Listener {
             "administrator";
     private static String BUY_SIGN_CREATED = Main.CHAT_TAG+"Buy sign created";
     private static String SELL_SIGN_CREATED = Main.CHAT_TAG+"Sell sign created";
+
+    private static String SIGN_CHEST_DELETED = Main.CHAT_TAG+"Sign and Chest deleted.";
 
     private static int SIGN_LINES = 4;
 
@@ -92,7 +96,7 @@ public class SignChessEvents implements Listener {
      */
     @EventHandler (priority = EventPriority.NORMAL)
     public void destroyedSignOrChess(BlockBreakEvent e) {
-        Block block = e.getBlock();
+        BlockState block = e.getBlock().getState();
         Player player = e.getPlayer();
         if (block instanceof Chest) {
             chestDestroyed((Chest)block, player);
@@ -102,12 +106,21 @@ public class SignChessEvents implements Listener {
         }
     }
 
+    /**
+     * Handles a deleted chest, by first checking if the chest corresponds
+     * to a chest present in the database and then by removing the related
+     * chest, sign and items from that database.
+     * @param chest, the destroyed {@link Chest}
+     * @param player, the {@link Player} that destroyed that chest.
+     */
     private void chestDestroyed(Chest chest, Player player) {
         try {
             DBConnection instance = DBConnection.getInstance();
             Long chessId = instance.getChestIdByPosition(chest.getX(), chest.getY(), chest.getZ());
-            if (instance.getChestIdByPosition(chest.getX(), chest.getY(), chest.getZ()) != null) {
+            if (chessId != null) {
                 instance.deleteChestAndSign(chessId);
+                instance.deleteRelatedChestItems(chessId);
+                player.sendMessage(SIGN_CHEST_DELETED);
             }
         } catch (SQLException e){
             player.sendMessage(Main.INTERNAL_ERROR_MESSAGE);
@@ -116,8 +129,26 @@ public class SignChessEvents implements Listener {
 
     }
 
+    /**
+     * Handles a deleted sign, by first checking if the sign corresponds
+     * to a sign present in the database and then by removing the related
+     * chest, sign and items from that database.
+     * @param sign, the destroyed {@link Sign}
+     * @param player, the {@link Player} that destroyed that chest.
+     */
     private void signDestroyed(Sign sign, Player player) {
-
+        try {
+            DBConnection instance = DBConnection.getInstance();
+            Pair<Long,Long> signAndChestIDs = instance.getSignIdByPosition(sign.getX(), sign.getY(), sign.getZ());
+            if (signAndChestIDs != null) {
+                instance.deleteChestAndSign(signAndChestIDs.second);
+                instance.deleteRelatedChestItems(signAndChestIDs.second);
+                player.sendMessage(SIGN_CHEST_DELETED);
+            }
+        } catch (SQLException e) {
+            player.sendMessage(Main.INTERNAL_ERROR_MESSAGE);
+            e.printStackTrace();
+        }
     }
 
     /**

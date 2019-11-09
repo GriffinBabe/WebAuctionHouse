@@ -1,8 +1,8 @@
 package be.griffinbabe.webauctionhouse.database;
 
+import be.griffinbabe.webauctionhouse.util.Pair;
 import org.bukkit.util.Vector;
 
-import javax.xml.transform.Result;
 import java.sql.*;
 
 /**
@@ -70,11 +70,18 @@ public class DBConnection {
     private static String SEARCH_CHESS_BY_POSITION = "select "+CHESS_ID+" from "+CHESS_TABLE+" where "+CHESS_X+" == ? and "+
             CHESS_Y+" == ? and "+CHESS_Z+" == ?;";
 
+    private static String SEARCH_SIGN_BY_POSITION = "select "+SIGN_ID+", "+SIGN_CHESS_ID+" from "+SIGN_TABLE+" where "+
+            SIGN_X+" ==? and "+SIGN_Y+" == ? and "+SIGN_Z+"== ?;";
+
     private static String INSERT_CHESS = "insert into "+CHESS_TABLE+"("+CHESS_X+","+CHESS_Y+","+CHESS_Z+","+CHESS_OWNER+
             ") VALUES(?,?,?,?);";
 
     private static String INSERT_SIGN = "insert into "+SIGN_TABLE+"("+SIGN_OWNER+","+SIGN_CHESS_ID+","+SIGN_X+","+
             SIGN_Y+","+SIGN_Z+","+SIGN_MODE+") VALUES (?,?,?,?,?,?);";
+
+    private static String DELETE_SIGN_BY_CHEST_ID = "delete from "+SIGN_TABLE+" where "+SIGN_CHESS_ID+"== ?;";
+
+    private static String DELETE_CHEST_BY_ID = "delete from "+CHESS_TABLE+ " where "+CHESS_ID+"== ?;";
 
     private static String DROP_TABLE_CHESS = "drop table if exists "+ CHESS_TABLE +";";
     private static String DROP_TABLE_PLAYER = "drop table if exists "+ PLAYER_TABLE +";";
@@ -169,6 +176,13 @@ public class DBConnection {
         return isQueryEmpty(stmt);
     }
 
+    /**
+     * Updates the player username to the database,
+     * usually called when a player changes it's username.
+     * @param uuid the player uuid (always unchanged)
+     * @param newName the player new username
+     * @throws SQLException if there is a problem with the database communication
+     */
     public void changePlayerUsername(String uuid, String newName) throws SQLException {
         Connection conn = DriverManager.getConnection(DATABASE_PATH);
         PreparedStatement stmt = conn.prepareStatement(UPDATE_USERNAME);
@@ -203,7 +217,7 @@ public class DBConnection {
      */
     private boolean isQueryEmpty(PreparedStatement stmt) throws SQLException{
         ResultSet set = stmt.executeQuery();
-        return set.next();
+        return !set.next();
     }
 
     /**
@@ -227,7 +241,7 @@ public class DBConnection {
             return null;
         }
         else {
-            Long result = set.getLong(0);
+            Long result = set.getLong(1);
             return result;
         }
     }
@@ -275,6 +289,7 @@ public class DBConnection {
         stmt.setInt(4, y);
         stmt.setInt(5, z);
         stmt.setString(6, signMode);
+        stmt.execute();
     }
 
 
@@ -310,10 +325,48 @@ public class DBConnection {
         if (!set.next()) {
             return null;
         } else {
-            int x = set.getInt(0);
-            int y = set.getInt(1);
-            int z = set.getInt(2);
+            int x = set.getInt(1);
+            int y = set.getInt(2);
+            int z = set.getInt(3);
             return new Vector(x,y,z);
         }
+    }
+
+    /**
+     * Deletes a sign and a related chess entry by the chess id.
+     * @param chestId, the chess id value
+     * @throws SQLException if there is a problem with the database communication.
+     */
+    public void deleteChestAndSign(Long chestId) throws SQLException {
+        Connection conn = DriverManager.getConnection(DATABASE_PATH);
+        PreparedStatement stmtSign = conn.prepareStatement(DELETE_SIGN_BY_CHEST_ID);
+        stmtSign.setInt(1, chestId.intValue());
+        stmtSign.execute();
+        PreparedStatement stmtChest = conn.prepareStatement(DELETE_CHEST_BY_ID);
+        stmtChest.setInt(1, chestId.intValue());
+        stmtChest.execute();
+    }
+
+    /**
+     * Deletes from the database all the items contained in a chest.
+     * @param chessId, the related chest id
+     */
+    public void deleteRelatedChestItems(Long chessId) {
+        // TODO Write this function
+    }
+
+    public Pair<Long,Long> getSignIdByPosition(int x, int y, int z) throws SQLException {
+        Connection conn = DriverManager.getConnection(DATABASE_PATH);
+        PreparedStatement stmt = conn.prepareStatement(SEARCH_SIGN_BY_POSITION);
+        stmt.setInt(1, x);
+        stmt.setInt(2, y);
+        stmt.setInt(3, z);
+        ResultSet set = stmt.executeQuery();
+        if (!set.next()) {
+            return null;
+        }
+        Long signId = set.getLong(1);
+        Long chestId = set.getLong(2);
+        return new Pair<Long, Long>(signId, chestId);
     }
 }
