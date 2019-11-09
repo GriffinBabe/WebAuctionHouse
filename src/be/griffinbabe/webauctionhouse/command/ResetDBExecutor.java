@@ -14,7 +14,7 @@ public class ResetDBExecutor implements CommandExecutor {
     private static String INTERNAL_ERROR_MESSAGE = "Internal SQLException, can't reset database";
 
     private Main plugin;
-    
+
     public ResetDBExecutor(Main plugin) {
         this.plugin = plugin;
     }

@@ -4,25 +4,13 @@ version: 1.0
 author: GriffinBabe
 description: Minecraft auction house with website support
 commands:
-<<<<<<< HEAD
   wahhelp:
-=======
-  wah help:
->>>>>>> origin/master
     description: Help pages for WebAuctionHouse plugin
     usage: /wahhelp
     permission: webauctionhouse.help
     permission-message: You don't have the webauctionhouse.help permission.
-<<<<<<< HEAD
   wahresetdb:
     description: Resets the databse of the plugin.
     usage: /wahresetdb
-=======
-  wah reset-db:
-    description: Resets the database of the plugin. Do not use this command lightly
-    usage: /wah resetdb
->>>>>>> origin/master
     permission: webauctionhouse.resetdb
     permission-message: You don't have the webauctionhouse.resetdb permission.
-
-

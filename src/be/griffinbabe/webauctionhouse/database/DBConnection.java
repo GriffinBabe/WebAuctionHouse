@@ -70,7 +70,7 @@ public class DBConnection {
     private static String INSERT_SIGN = "insert into "+SIGN_TABLE+"("+SIGN_OWNER+","+SIGN_CHESS_ID+","+SIGN_X+","+
             SIGN_Y+","+SIGN_Z+","+SIGN_MODE+") VALUES (?,?,?,?,?,?);";
 
-    private static String DROP_TABLE = "drop table if exists database.?;";
+    private static String DROP_TABLE = "drop table if exists ?;";
 
     private static DBConnection DBConnection = null;
 
