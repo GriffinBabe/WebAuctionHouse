@@ -10,13 +10,11 @@ import java.sql.SQLException;
 
 public class ResetDBExecutor implements CommandExecutor {
 
-    private static String SUCCESS = "Database reseted, please log again";
-    private static String INTERNAL_ERROR = "Internal error, couldn't reset database";
+    private static String SUCCESS_MESSAGE = "Database reseted, please log again";
+    private static String INTERNAL_ERROR_MESSAGE = "Internal SQLException, can't reset database";
 
     private Main plugin;
-
-    private static String INTERNAL_ERROR = "Internal SQLException, can't reset database";
-
+    
     public ResetDBExecutor(Main plugin) {
         this.plugin = plugin;
     }
@@ -26,10 +24,10 @@ public class ResetDBExecutor implements CommandExecutor {
         try {
             DBConnection connection = DBConnection.getInstance();
             connection.resetDB();
-            commandSender.sendMessage(SUCCESS);
+            commandSender.sendMessage(SUCCESS_MESSAGE);
         } catch (SQLException e) {
             e.printStackTrace();
-            commandSender.sendMessage(INTERNAL_ERROR);
+            commandSender.sendMessage(INTERNAL_ERROR_MESSAGE);
         }
         return false;
     }
