@@ -40,7 +40,10 @@ public class ItemEvents implements Listener {
                 // stacks represent all the items contained by the chess
                 ItemStack[] stacks = inventory.getContents();
                 for (ItemStack stack : stacks) {
-                    
+                    // checks the lore of the item data to see if it's identified
+                    String stackid = stack.getItemMeta().getLore().get(0);
+                    instance.checkItemId(stackid);
+
                     // String itemid = stack.getItemMeta().get
                 }
             } catch (SQLException exc) {
