@@ -36,7 +36,6 @@ public class DBConnection {
 
     private static String ITEM_ID = "id";
     private static String ITEM_CHESS_ID = "chess_id";
-    private static String
 
     private static String CREATE_SIGN_TABLE = "CREATE TABLE IF NOT EXISTS "+SIGN_TABLE+
             "(" + SIGN_ID + " integer PRIMARY KEY, \n" +

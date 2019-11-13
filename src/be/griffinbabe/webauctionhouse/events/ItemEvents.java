@@ -1,12 +1,21 @@
 package be.griffinbabe.webauctionhouse.events;
 
 import be.griffinbabe.webauctionhouse.Main;
+import be.griffinbabe.webauctionhouse.database.DBConnection;
 import org.bukkit.Location;
+import org.bukkit.entity.Item;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryAction;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+
+import java.sql.SQLException;
 
 public class ItemEvents implements Listener {
 
@@ -18,11 +27,27 @@ public class ItemEvents implements Listener {
 
     @EventHandler (priority = EventPriority.NORMAL)
     public void onInventoryClose(InventoryCloseEvent e) {
-        e.getPlayer().sendMessage("You closed your inventory!");
-        if (e.getInventory().getType() == InventoryType.CHEST) {
-            e.getPlayer().sendMessage("That's a chest");
+        Inventory inventory = e.getInventory();
+        if (inventory.getType() == InventoryType.CHEST) {
+            e.getPlayer().sendMessage("You closed a chest");
+            Location location = inventory.getLocation();
+            try {
+                DBConnection instance = DBConnection.getInstance();
+                Long isWahChest = instance.getChestIdByPosition
+                        (location.getBlockX(), location.getBlockY(), location.getBlockZ());
+                if (isWahChest == null) return;
+                e.getPlayer().sendMessage("This is a WebAuctionHouse chest");
+                // stacks represent all the items contained by the chess
+                ItemStack[] stacks = inventory.getContents();
+                for (ItemStack stack : stacks) {
+                    
+                    // String itemid = stack.getItemMeta().get
+                }
+            } catch (SQLException exc) {
+                exc.printStackTrace();
+                e.getPlayer().sendMessage(Main.INTERNAL_ERROR_MESSAGE);
+            }
         }
-        Location l  = e.getInventory().getLocation();
-        e.getPlayer().sendMessage(l.getBlockX()+" "+l.getBlockY()+" "+l.getBlockZ());
     }
+
 }
